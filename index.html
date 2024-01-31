@@ -176,13 +176,21 @@
         let isOverexposed = DetectOverExposure(img);
         let isSkewed = await DetectSkewness();
         let isAspectRatioIncorrect = DetectIfAspectRatioIncorrect(img);
+        let overallScore = 0;
+        overallScore = overallScore + (isBlurry ? 0 : 1) * 20;
+        overallScore = overallScore + (isOverexposed ? 0 : 1) * 20;
+        overallScore = overallScore + (isAspectRatioIncorrect ? 0 : 1) * 20;
+        overallScore = overallScore + (isSkewed ? 0 : 1) * 20;
+        overallScore = overallScore + OCRConfidence * 0.2;
         let data = {
           "Blurry":isBlurry,
           "Overexposed":isOverexposed,
           "Incorrect Aspect Ratio":isAspectRatioIncorrect,
           "Skewed":isSkewed,
-          "OCR Confidence":OCRConfidence
+          "OCR Confidence":OCRConfidence,
+          "Score":overallScore
         }
+        
         DisplayResults(data);
       } catch (error) {
         console.log(error);
