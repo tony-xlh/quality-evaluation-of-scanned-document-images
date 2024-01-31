@@ -45,6 +45,7 @@
       <div class="scanner">
         <button id="scanButton">Scan</button>
         <button id="loadButton">Load Files</button>
+        <button id="editButton">Edit</button>
         <div id="dwtcontrolContainer"></div>
       </div>
       <div class="evaluation">
@@ -83,6 +84,11 @@
       document.getElementById("loadButton").addEventListener("click",function(){
         LoadFile();
       });
+      document.getElementById("editButton").addEventListener("click",function(){
+        let imageEditor = DWObject.Viewer.createImageEditor();
+        imageEditor.show();
+      });
+      
       document.getElementById("evaluateButton").addEventListener("click",function(){
         Evaluate();
       });
