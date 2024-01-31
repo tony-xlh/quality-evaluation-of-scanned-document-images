@@ -5,9 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Quality Evaluation of Scanned Documents</title>
   <style>
+    .main {
+      display: flex;
+    }
+
     #dwtcontrolContainer {
       width: 240px;
       height: 320px;
+    }
+
+    .scanner {
+      padding-right: 1em;
     }
   </style>
 </head>
@@ -15,9 +23,17 @@
   <div class="home">
     <h2>Quality Evaluation of Scanned Documents</h2>
     <div class="main">
-      <button id="scanButton">Scan</button>
-      <button id="loadButton">Load Files</button>
-      <div id="dwtcontrolContainer"></div>
+      <div class="scanner">
+        <button id="scanButton">Scan</button>
+        <button id="loadButton">Load Files</button>
+        <div id="dwtcontrolContainer"></div>
+      </div>
+      <div class="evaluation">
+        <div class="DWTStatus status"></div>
+        <div class="OpenCVStatus status"></div>
+        <div class="TesseractStatus status"></div>
+        <button id="evaluateButton">Evaluate Selected Image</button>
+      </div>
     </div>
   </div>
   <script src="https://unpkg.com/dwt@18.4.2/dist/dynamsoft.webtwain.min.js"></script>
@@ -72,13 +88,13 @@
     function initDWT(){
       return new Promise((resolve, reject) => {
         const title = document.querySelector("h2").innerText;
-        document.querySelector("h2").innerText = "Loading Dynamic Web TWAIN...";
+        document.getElementsByClassName("DWTStatus")[0].innerText = "Loading Dynamic Web TWAIN...";
         Dynamsoft.DWT.CreateDWTObjectEx(
         {
           WebTwainId: 'dwtcontrol'
         },
         function(obj) {
-          document.querySelector("h2").innerText = title;
+          document.getElementsByClassName("DWTStatus")[0].innerText = "Web TWAIN is Ready.";
           DWObject = obj;
           DWObject.Viewer.bind(document.getElementById('dwtcontrolContainer'));
           DWObject.Viewer.height = "100%";
@@ -88,7 +104,7 @@
         },
         function(err) {
           console.log(err);
-          document.querySelector("h2").innerText = "Failed to load Dynamic Web TWAIN";
+          document.getElementsByClassName("DWTStatus")[0].innerText = "Failed to load Dynamic Web TWAIN";
           reject(err);
         }
       );
