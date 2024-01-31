@@ -57,13 +57,13 @@
       </div>
     </div>
   </div>
-  <script src="https://unpkg.com/dwt@18.4.2/dist/dynamsoft.webtwain.min.js"></script>
+  <script src="/dwt/dist/dynamsoft.webtwain.min.js"></script>
   <script src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'></script>
   <script>
     let DWObject;
     Dynamsoft.DWT.AutoLoad = false;
     Dynamsoft.DWT.ProductKey = "DLS2eyJoYW5kc2hha2VDb2RlIjoiMjAwMDAxLTE2NDk4Mjk3OTI2MzUiLCJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSIsInNlc3Npb25QYXNzd29yZCI6IndTcGR6Vm05WDJrcEQ5YUoifQ=="; //one-day trial
-    Dynamsoft.DWT.ResourcesPath = "https://unpkg.com/dwt@18.4.2/dist";
+    Dynamsoft.DWT.ResourcesPath = "/dwt/dist";
     
     window.onload = function(){
       initDWT();
@@ -154,8 +154,13 @@
     async function Evaluate(){
       let img = await LoadImage();
       let isBlurry = DetectBlurriness(img);
+      let isOverexposed = DetectOverExposure(img);
       console.log(isBlurry);
-      DisplayResults({"Blurry":isBlurry});
+      let data = {
+        "Blurry":isBlurry,
+        "Overexposed":isOverexposed
+      }
+      DisplayResults(data);
     }
 
     function LoadImage(){
@@ -201,6 +206,34 @@
       mean.delete();
       standardDeviationMat.delete();
       return isBlurry;
+    }
+
+    function DetectOverExposure(src){
+      let img = cv.imread(src);
+      cv.cvtColor(img, img, cv.COLOR_RGBA2GRAY, 0);
+      let srcVec = new cv.MatVector();
+      srcVec.push_back(img);
+      let accumulate = false;
+      let channels = [0];
+      let histSize = [256];
+      let ranges = [0, 255];
+      let hist = new cv.Mat();
+      let mask = new cv.Mat();
+      let color = new cv.Scalar(255, 255, 255);
+      let scale = 2;
+      // You can try more different parameters
+      cv.calcHist(srcVec, channels, mask, hist, histSize, ranges, accumulate);
+      
+      let result = cv.minMaxLoc(hist, mask);
+      let max = result.maxVal;
+      console.log(max);
+      hist.delete();
+      img.delete();
+      if (max > 400000) {
+        return true;
+      } else {
+        return false;
+      }
     }
 
     function DisplayResults(data){
