@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quality Evaluation of Scanned Documents</title>
+  <style>
+    #dwtcontrolContainer {
+      width: 240px;
+      height: 320px;
+    }
+  </style>
+</head>
+<body>
+  <div class="home">
+    <h2>Quality Evaluation of Scanned Documents</h2>
+    <div class="main">
+      <button id="scanButton">Scan</button>
+      <button id="loadButton">Load Files</button>
+      <div id="dwtcontrolContainer"></div>
+    </div>
+  </div>
+  <script src="https://unpkg.com/dwt@18.4.2/dist/dynamsoft.webtwain.min.js"></script>
+  <script>
+    let DWObject;
+    Dynamsoft.DWT.AutoLoad = false;
+    Dynamsoft.DWT.ProductKey = "DLS2eyJoYW5kc2hha2VDb2RlIjoiMjAwMDAxLTE2NDk4Mjk3OTI2MzUiLCJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSIsInNlc3Npb25QYXNzd29yZCI6IndTcGR6Vm05WDJrcEQ5YUoifQ=="; //one-day trial
+    Dynamsoft.DWT.ResourcesPath = "https://unpkg.com/dwt@18.4.2/dist";
+    
+    window.onload = function(){
+      initDWT();
+      document.getElementById("scanButton").addEventListener("click",function(){
+        AcquireImage();
+      });
+      document.getElementById("loadButton").addEventListener("click",function(){
+        LoadFile();
+      });
+    }
+
+    function LoadFile(){
+      if (DWObject) {
+        DWObject.IfShowFileDialog = true;
+        // PDF Rasterizer Addon is used here to ensure PDF support
+        DWObject.Addon.PDF.SetResolution(200);
+        DWObject.Addon.PDF.SetConvertMode(Dynamsoft.DWT.EnumDWT_ConvertMode.CM_RENDERALL);
+        DWObject.LoadImageEx("", Dynamsoft.DWT.EnumDWT_ImageType.IT_ALL);
+      }
+    }
+
+    function AcquireImage() {
+      if (DWObject) {
+        DWObject.SelectSourceAsync()
+        .then(function () {
+          return DWObject.AcquireImageAsync({
+            IfDisableSourceAfterAcquire: true,
+          });
+        })
+        .then(function (result) {
+          console.log(result);
+        })
+        .catch(function (exp) {
+          console.error(exp.message);
+        })
+        .finally(function () {
+          DWObject.CloseSourceAsync().catch(function (e) {
+            console.error(e);
+          });
+        });
+      }
+    }
+
+    function initDWT(){
+      return new Promise((resolve, reject) => {
+        const title = document.querySelector("h2").innerText;
+        document.querySelector("h2").innerText = "Loading Dynamic Web TWAIN...";
+        Dynamsoft.DWT.CreateDWTObjectEx(
+        {
+          WebTwainId: 'dwtcontrol'
+        },
+        function(obj) {
+          document.querySelector("h2").innerText = title;
+          DWObject = obj;
+          DWObject.Viewer.bind(document.getElementById('dwtcontrolContainer'));
+          DWObject.Viewer.height = "100%";
+          DWObject.Viewer.width = "100%";
+          DWObject.Viewer.show();
+          resolve();
+        },
+        function(err) {
+          console.log(err);
+          document.querySelector("h2").innerText = "Failed to load Dynamic Web TWAIN";
+          reject(err);
+        }
+      );
+      })
+    }
+  </script>
+</body>
+</html>
