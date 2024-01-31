@@ -161,20 +161,33 @@
     }
 
     async function Evaluate(){
-      let img = await LoadImage();
-      let OCRConfidence = await getOCRConfidence(img);
-      let isBlurry = DetectBlurriness(img);
-      let isOverexposed = DetectOverExposure(img);
-      let isSkewed = await DetectSkewness();
-      let isAspectRatioIncorrect = DetectIfAspectRatioIncorrect(img);
-      let data = {
-        "Blurry":isBlurry,
-        "Overexposed":isOverexposed,
-        "Incorrect Aspect Ratio":isAspectRatioIncorrect,
-        "Skewed":isSkewed,
-        "OCR Confidence":OCRConfidence
+      let evaluateButton = document.getElementById("evaluateButton");
+      let originalText = evaluateButton.innerText;
+      if (originalText === "Evaluating...") {
+        return;
       }
-      DisplayResults(data);
+      try {
+        let results = document.getElementById("results");
+        results.innerHTML = "";
+        evaluateButton.innerText = "Evaluating...";
+        let img = await LoadImage();
+        let OCRConfidence = await getOCRConfidence(img);
+        let isBlurry = DetectBlurriness(img);
+        let isOverexposed = DetectOverExposure(img);
+        let isSkewed = await DetectSkewness();
+        let isAspectRatioIncorrect = DetectIfAspectRatioIncorrect(img);
+        let data = {
+          "Blurry":isBlurry,
+          "Overexposed":isOverexposed,
+          "Incorrect Aspect Ratio":isAspectRatioIncorrect,
+          "Skewed":isSkewed,
+          "OCR Confidence":OCRConfidence
+        }
+        DisplayResults(data);
+      } catch (error) {
+        console.log(error);
+      }
+      evaluateButton.innerText = originalText;
     }
 
     function LoadImage(){
@@ -305,7 +318,6 @@
 
     function DisplayResults(data){
       let results = document.getElementById("results");
-      results.innerHTML = "";
       let table = document.createElement("table");
       let thead = document.createElement('thead');
       let tbody = document.createElement('tbody');
