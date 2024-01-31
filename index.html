@@ -31,12 +31,13 @@
       <div class="evaluation">
         <div class="DWTStatus status">Loading Dynamic Web TWAIN...</div>
         <div class="OpenCVStatus status">Loading OpenCV...</div>
-        <div class="TesseractStatus status"></div>
+        <div class="TesseractStatus status">Loading Tesseract...</div>
         <button id="evaluateButton">Evaluate Selected Image</button>
       </div>
     </div>
   </div>
   <script src="https://unpkg.com/dwt@18.4.2/dist/dynamsoft.webtwain.min.js"></script>
+  <script src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'></script>
   <script>
     let DWObject;
     Dynamsoft.DWT.AutoLoad = false;
@@ -45,6 +46,7 @@
     
     window.onload = function(){
       initDWT();
+      initTesseract();
       document.getElementById("scanButton").addEventListener("click",function(){
         AcquireImage();
       });
@@ -116,6 +118,13 @@
         }
       );
       })
+    }
+
+    async function initTesseract(){
+      const worker = await Tesseract.createWorker("eng", 1, {
+        logger: function(m){console.log(m);}
+      });
+      document.getElementsByClassName("TesseractStatus")[0].innerText = 'Tesseract is ready.';
     }
   </script>
   <script async src="/opencv.js" type="text/javascript"></script>
