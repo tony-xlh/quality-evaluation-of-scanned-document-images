@@ -254,7 +254,9 @@
         let height = documentSize.split("x")[1];
         let ratio = width / height;
         let imgRatio = img.naturalWidth / img.naturalHeight;
-        if (ratio / imgRatio > 1.1 || imgRatio / ratio > 1.1) {
+        let percent = Math.max(ratio,imgRatio) / Math.min(ratio,imgRatio);
+        if (percent) {
+          console.log(percent);
           return true;
         }else{
           return false;
