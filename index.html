@@ -69,6 +69,7 @@
   <script src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'></script>
   <script>
     let DWObject;
+    let worker;
     Dynamsoft.DWT.AutoLoad = false;
     Dynamsoft.DWT.ProductKey = "DLS2eyJoYW5kc2hha2VDb2RlIjoiMjAwMDAxLTE2NDk4Mjk3OTI2MzUiLCJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSIsInNlc3Npb25QYXNzd29yZCI6IndTcGR6Vm05WDJrcEQ5YUoifQ=="; //one-day trial
     Dynamsoft.DWT.ResourcesPath = "/dwt/dist";
@@ -153,7 +154,7 @@
     }
 
     async function initTesseract(){
-      let worker = await Tesseract.createWorker("eng", 1, {
+      worker = await Tesseract.createWorker("eng", 1, {
         logger: function(m){console.log(m);}
       });
       document.getElementsByClassName("TesseractStatus")[0].innerText = 'Tesseract is ready.';
@@ -161,18 +162,18 @@
 
     async function Evaluate(){
       let img = await LoadImage();
+      let OCRConfidence = await getOCRConfidence(img);
       let isBlurry = DetectBlurriness(img);
       let isOverexposed = DetectOverExposure(img);
-      console.log(isBlurry);
       let isSkewed = await DetectSkewness();
       let isAspectRatioIncorrect = DetectIfAspectRatioIncorrect(img);
       let data = {
         "Blurry":isBlurry,
         "Overexposed":isOverexposed,
         "Incorrect Aspect Ratio":isAspectRatioIncorrect,
-        "Skewed":isSkewed
+        "Skewed":isSkewed,
+        "OCR Confidence":OCRConfidence
       }
-      
       DisplayResults(data);
     }
 
@@ -247,6 +248,20 @@
       } else {
         return false;
       }
+    }
+
+    async function getOCRConfidence(img){
+      const result = await worker.recognize(img);
+      const data = result.data;
+      console.log(data);
+      let size = data.lines.length;
+      let totalConfidence = 0;
+      data.lines.forEach(line => {
+        totalConfidence = line.confidence + totalConfidence;
+      });
+      let confidence = parseInt(totalConfidence/size);
+      console.log(confidence);
+      return confidence;
     }
 
     function DetectIfAspectRatioIncorrect(img){
