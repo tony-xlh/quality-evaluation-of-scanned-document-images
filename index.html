@@ -293,7 +293,7 @@
         let ratio = width / height;
         let imgRatio = img.naturalWidth / img.naturalHeight;
         let percent = Math.max(ratio,imgRatio) / Math.min(ratio,imgRatio);
-        if (percent) {
+        if (percent > 1.1) {
           console.log(percent);
           return true;
         }else{
