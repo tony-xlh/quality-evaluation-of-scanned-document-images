@@ -52,6 +52,14 @@
         <div class="OpenCVStatus status">Loading OpenCV...</div>
         <div class="TesseractStatus status">Loading Tesseract...</div>
         <img id="hiddenImage"/>
+        <label>
+          Expected Document Type:
+          <select id="documentType">
+            <option value="">None</option>
+            <option value="2480x3508">A4</option>
+            <option value="1013x638">ID Card</option>
+          </select>
+        </label>
         <button id="evaluateButton">Evaluate Selected Image</button>
         <div id="results"></div>
       </div>
@@ -156,10 +164,13 @@
       let isBlurry = DetectBlurriness(img);
       let isOverexposed = DetectOverExposure(img);
       console.log(isBlurry);
+      let isAspectRatioIncorrect = DetectIfAspectRatioIncorrect(img);
       let data = {
         "Blurry":isBlurry,
-        "Overexposed":isOverexposed
+        "Overexposed":isOverexposed,
+        "Incorrect Aspect Ratio":isAspectRatioIncorrect
       }
+      
       DisplayResults(data);
     }
 
@@ -232,6 +243,23 @@
       if (max > 400000) {
         return true;
       } else {
+        return false;
+      }
+    }
+
+    function DetectIfAspectRatioIncorrect(img){
+      let documentSize = document.getElementById("documentType").selectedOptions[0].value;
+      if (documentSize) {
+        let width = documentSize.split("x")[0];
+        let height = documentSize.split("x")[1];
+        let ratio = width / height;
+        let imgRatio = img.naturalWidth / img.naturalHeight;
+        if (ratio / imgRatio > 1.1 || imgRatio / ratio > 1.1) {
+          return true;
+        }else{
+          return false;
+        }
+      }else{
         return false;
       }
     }
