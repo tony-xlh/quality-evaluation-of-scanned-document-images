@@ -132,24 +132,24 @@
       return new Promise((resolve, reject) => {
         let title = document.querySelector("h2").innerText;
         Dynamsoft.DWT.CreateDWTObjectEx(
-        {
-          WebTwainId: 'dwtcontrol'
-        },
-        function(obj) {
-          document.getElementsByClassName("DWTStatus")[0].innerText = "Web TWAIN is Ready.";
-          DWObject = obj;
-          DWObject.Viewer.bind(document.getElementById('dwtcontrolContainer'));
-          DWObject.Viewer.height = "100%";
-          DWObject.Viewer.width = "100%";
-          DWObject.Viewer.show();
-          resolve();
-        },
-        function(err) {
-          console.log(err);
-          document.getElementsByClassName("DWTStatus")[0].innerText = "Failed to load Dynamic Web TWAIN";
-          reject(err);
-        }
-      );
+          {
+            WebTwainId: 'dwtcontrol'
+          },
+          function(obj) {
+            document.getElementsByClassName("DWTStatus")[0].innerText = "Web TWAIN is Ready.";
+            DWObject = obj;
+            DWObject.Viewer.bind(document.getElementById('dwtcontrolContainer'));
+            DWObject.Viewer.height = "100%";
+            DWObject.Viewer.width = "100%";
+            DWObject.Viewer.show();
+            resolve();
+          },
+          function(err) {
+            console.log(err);
+            document.getElementsByClassName("DWTStatus")[0].innerText = "Failed to load Dynamic Web TWAIN";
+            reject(err);
+          }
+        );
       })
     }
 
@@ -190,7 +190,6 @@
           "OCR Confidence":OCRConfidence,
           "Score":overallScore
         }
-        
         DisplayResults(data);
       } catch (error) {
         console.log(error);
@@ -205,15 +204,15 @@
           resolve(img);
         }
         DWObject.ConvertToBase64(
-            [DWObject.SelectedImagesIndices[0]],
-            Dynamsoft.DWT.EnumDWT_ImageType.IT_PNG,
-            function(result, indices, type) {
-              img.src = "data:image/png;base64,"+result.getData(0, result.getLength());
-            },
-            function(errorCode, errorString) {
-              console.log(errorString);
-              reject(errorString);
-            }
+          [DWObject.SelectedImagesIndices[0]],
+          Dynamsoft.DWT.EnumDWT_ImageType.IT_PNG,
+          function(result, indices, type) {
+            img.src = "data:image/png;base64,"+result.getData(0, result.getLength());
+          },
+          function(errorCode, errorString) {
+            console.log(errorString);
+            reject(errorString);
+          }
         );
       })
     }
