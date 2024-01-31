@@ -17,6 +17,10 @@
     .scanner {
       padding-right: 1em;
     }
+
+    #hiddenImage{
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -32,6 +36,7 @@
         <div class="DWTStatus status">Loading Dynamic Web TWAIN...</div>
         <div class="OpenCVStatus status">Loading OpenCV...</div>
         <div class="TesseractStatus status">Loading Tesseract...</div>
+        <img id="hiddenImage"/>
         <button id="evaluateButton">Evaluate Selected Image</button>
       </div>
     </div>
@@ -52,6 +57,9 @@
       });
       document.getElementById("loadButton").addEventListener("click",function(){
         LoadFile();
+      });
+      document.getElementById("evaluateButton").addEventListener("click",function(){
+        Evaluate();
       });
     }
 
@@ -126,6 +134,59 @@
       });
       document.getElementsByClassName("TesseractStatus")[0].innerText = 'Tesseract is ready.';
     }
+
+    async function Evaluate(){
+      let img = await LoadImage();
+      let isBlurry = DetectBlurriness(img);
+      console.log(isBlurry);
+    }
+
+    function LoadImage(){
+      return new Promise((resolve, reject) => {
+        let img = document.getElementById("hiddenImage");
+        img.onload = function(){
+          resolve(img);
+        }
+        DWObject.ConvertToBase64(
+            [DWObject.SelectedImagesIndices[0]],
+            Dynamsoft.DWT.EnumDWT_ImageType.IT_PNG,
+            function(result, indices, type) {
+              img.src = "data:image/png;base64,"+result.getData(0, result.getLength());
+            },
+            function(errorCode, errorString) {
+              console.log(errorString);
+              reject(errorString);
+            }
+        );
+      })
+    }
+
+    function DetectBlurriness(src){
+      let img = cv.imread(src);
+
+      let gray = new cv.Mat();
+      cv.cvtColor(img, gray, cv.COLOR_RGBA2GRAY);
+
+      let laplacianMat = new cv.Mat();
+      cv.Laplacian(gray, laplacianMat, cv.CV_64F);
+      const mean = new cv.Mat(1, 4, cv.CV_64F);
+      const standardDeviationMat = new cv.Mat(1, 4, cv.CV_64F);
+      cv.meanStdDev(laplacianMat, mean, standardDeviationMat);
+
+      const standardDeviation = standardDeviationMat.doubleAt(0, 0);
+      const variance = standardDeviation * standardDeviation;
+      console.log(variance);
+      let threshold = 200;
+      let isBlurry = variance < threshold;
+      img.delete();
+      gray.delete();
+      laplacianMat.delete();
+      mean.delete();
+      standardDeviationMat.delete();
+      return isBlurry;
+    }
+
+    
   </script>
   <script async src="/opencv.js" type="text/javascript"></script>
 </body>
