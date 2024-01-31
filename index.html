@@ -29,8 +29,8 @@
         <div id="dwtcontrolContainer"></div>
       </div>
       <div class="evaluation">
-        <div class="DWTStatus status"></div>
-        <div class="OpenCVStatus status"></div>
+        <div class="DWTStatus status">Loading Dynamic Web TWAIN...</div>
+        <div class="OpenCVStatus status">Loading OpenCV...</div>
         <div class="TesseractStatus status"></div>
         <button id="evaluateButton">Evaluate Selected Image</button>
       </div>
@@ -52,6 +52,14 @@
         LoadFile();
       });
     }
+
+    var Module = {
+      // https://emscripten.org/docs/api_reference/module.html#Module.onRuntimeInitialized
+      onRuntimeInitialized() {
+        document.getElementsByClassName("OpenCVStatus")[0].innerText = 'OpenCV.js is ready.';
+      }
+    };
+
 
     function LoadFile(){
       if (DWObject) {
@@ -88,7 +96,6 @@
     function initDWT(){
       return new Promise((resolve, reject) => {
         const title = document.querySelector("h2").innerText;
-        document.getElementsByClassName("DWTStatus")[0].innerText = "Loading Dynamic Web TWAIN...";
         Dynamsoft.DWT.CreateDWTObjectEx(
         {
           WebTwainId: 'dwtcontrol'
@@ -111,5 +118,6 @@
       })
     }
   </script>
+  <script async src="/opencv.js" type="text/javascript"></script>
 </body>
 </html>
