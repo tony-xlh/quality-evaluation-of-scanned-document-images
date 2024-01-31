@@ -164,11 +164,13 @@
       let isBlurry = DetectBlurriness(img);
       let isOverexposed = DetectOverExposure(img);
       console.log(isBlurry);
+      let isSkewed = await DetectSkewness();
       let isAspectRatioIncorrect = DetectIfAspectRatioIncorrect(img);
       let data = {
         "Blurry":isBlurry,
         "Overexposed":isOverexposed,
-        "Incorrect Aspect Ratio":isAspectRatioIncorrect
+        "Incorrect Aspect Ratio":isAspectRatioIncorrect,
+        "Skewed":isSkewed
       }
       
       DisplayResults(data);
@@ -264,6 +266,26 @@
       }else{
         return false;
       }
+    }
+
+    function DetectSkewness(){
+      return new Promise((resolve, reject) => {
+        DWObject.GetSkewAngle(
+          DWObject.SelectedImagesIndices[0],
+          function(angle) {
+            console.log("skew angle: " + angle);
+            if (Math.abs(angle)>1) {
+              resolve(true);
+            }else{
+              resolve(false);
+            }
+          },
+          function(errorCode, errorString) {
+            console.log(errorString);
+            reject(errorString);
+          }
+        );
+      })
     }
 
     function DisplayResults(data){
