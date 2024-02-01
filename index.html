@@ -263,15 +263,28 @@
       let scale = 2;
       // You can try more different parameters
       cv.calcHist(srcVec, channels, mask, hist, histSize, ranges, accumulate);
-      
       let result = cv.minMaxLoc(hist, mask);
-      let max = result.maxVal;
-      console.log(max);
-      hist.delete();
-      img.delete();
-      if (max > 400000) {
-        return true;
-      } else {
+      console.log(result);
+      if (result.maxLoc.y > 240) {
+        let data = hist.data32F
+        let darkPixels = 0;
+        for (let index = 0; index <= 200; index++) {
+          const pixels = data[index];
+          darkPixels = darkPixels + pixels;
+        }
+        let totalPixels = src.naturalHeight * src.naturalWidth;
+        let percent = darkPixels/totalPixels;
+        hist.delete();
+        img.delete();
+        console.log(percent);
+        if (percent < 0.2) {
+          return true;
+        } else {
+          return false;
+        }
+      }else{
+        hist.delete();
+        img.delete();
         return false;
       }
     }
