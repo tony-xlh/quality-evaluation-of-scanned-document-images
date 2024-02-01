@@ -2,6 +2,8 @@
 
 A web app evaluating the quality the scanned document images.
 
+[Online demo](https://tony-xlh.github.io/quality-evaluation-of-scanned-document-images/)
+
 The app can evaluate the quality in the following aspects:
 
 * Blur
