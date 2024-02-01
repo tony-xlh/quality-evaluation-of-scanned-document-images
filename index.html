@@ -66,14 +66,15 @@
       </div>
     </div>
   </div>
-  <script src="/dwt/dist/dynamsoft.webtwain.min.js"></script>
+  <!--<script src="/dwt/dist/dynamsoft.webtwain.min.js"></script>-->
+  <script src="https://unpkg.com/dwt@18.4.2/dist/dynamsoft.webtwain.min.js"></script>
   <script src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'></script>
   <script>
     let DWObject;
     let worker;
     Dynamsoft.DWT.AutoLoad = false;
     Dynamsoft.DWT.ProductKey = "DLS2eyJoYW5kc2hha2VDb2RlIjoiMjAwMDAxLTE2NDk4Mjk3OTI2MzUiLCJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSIsInNlc3Npb25QYXNzd29yZCI6IndTcGR6Vm05WDJrcEQ5YUoifQ=="; //one-day trial
-    Dynamsoft.DWT.ResourcesPath = "/dwt/dist";
+    Dynamsoft.DWT.ResourcesPath = "https://unpkg.com/dwt@18.4.2/dist" //"/dwt/dist";
     
     window.onload = function(){
       initDWT();
@@ -374,6 +375,7 @@
       results.appendChild(table);
     }
   </script>
-  <script async src="/opencv.js" type="text/javascript"></script>
+  <script async src="https://docs.opencv.org/4.8.0/opencv.js/opencv.js" type="text/javascript"></script>
+  <!--<script async src="/opencv.js/opencv.js" type="text/javascript"></script>-->
 </body>
 </html>
